@@ -1,0 +1,92 @@
+import io
+import os
+import sys
+
+PROJECT_DIR = "/home/yourname/mysite_rewards"
+if PROJECT_DIR not in sys.path:
+    sys.path.insert(0, PROJECT_DIR)
+
+# تمرير متغيرات البيئة (اختياري ومستحسن)
+os.environ.setdefault("SECRET_KEY", "change-this-to-a-long-random-secret-key")
+os.environ.setdefault("TELEGRAM_BOT_TOKEN", "1449862347:AAE5eRycQGU4kdlFePuR4XciSazQdjtEuqw")
+os.environ.setdefault("TELEGRAM_CHAT_ID", "1188729209")
+
+import rewards_page as rp
+
+
+class WSGIRequestMock:
+    def __init__(self, method: str, full_path: str, raw_body: bytes):
+        self.rfile = io.BytesIO(raw_body)
+        self.wfile = io.BytesIO()
+        self.raw_requestline = f"{method} {full_path} HTTP/1.1\r\n".encode("latin-1")
+        self.error_code = None
+        self.error_message = None
+
+    def makefile(self, mode, *args, **kwargs):
+        if "r" in mode:
+            return self.rfile
+        return self.wfile
+
+
+def application(environ, start_response):
+    method = environ.get("REQUEST_METHOD", "GET")
+    path = environ.get("PATH_INFO", "/")
+    query_string = environ.get("QUERY_STRING", "")
+    full_path = f"{path}?{query_string}" if query_string else path
+
+    try:
+        length = int(environ.get("CONTENT_LENGTH") or "0")
+    except ValueError:
+        length = 0
+    body = environ["wsgi.input"].read(length) if length > 0 else b""
+
+    headers_in = {}
+    for key, val in environ.items():
+        if key.startswith("HTTP_"):
+            h_name = key[5:].replace("_", "-").title()
+            headers_in[h_name] = val
+    if environ.get("CONTENT_TYPE"):
+        headers_in["Content-Type"] = environ["CONTENT_TYPE"]
+    if environ.get("REMOTE_ADDR") and "X-Forwarded-For" not in headers_in:
+        headers_in["X-Forwarded-For"] = environ["REMOTE_ADDR"]
+
+    status_line = ["200 OK"]
+    resp_headers = []
+
+    class CapturedHandler(rp.RewardsHandler):
+        def send_response(self, code, message=None):
+            msg = message or ""
+            status_line[0] = f"{code} {msg}".strip()
+
+        def send_header(self, keyword, value):
+            resp_headers.append((keyword, str(value)))
+
+        def end_headers(self):
+            pass
+
+    req_mock = WSGIRequestMock(method, full_path, body)
+    handler = object.__new__(CapturedHandler)
+    handler.request = req_mock
+    handler.client_address = (environ.get("REMOTE_ADDR", "127.0.0.1"), 0)
+    handler.server = None
+    handler.rfile = req_mock.rfile
+    handler.wfile = req_mock.wfile
+    handler.raw_requestline = req_mock.raw_requestline
+    handler.requestline = f"{method} {full_path} HTTP/1.1"
+    handler.request_version = "HTTP/1.1"
+    handler.command = method
+    handler.path = full_path
+    handler.headers = headers_in
+    handler.close_connection = True
+
+    if method == "GET":
+        handler.do_GET()
+    elif method == "POST":
+        handler.do_POST()
+    else:
+        handler.send_response(405)
+        handler.end_headers()
+
+    out_bytes = req_mock.wfile.getvalue()
+    start_response(status_line[0], resp_headers)
+    return [out_bytes]
